@@ -1,0 +1,64 @@
+version: '2'
+services:
+  datastore:
+    image: busybox
+    volumes:
+      - bundle_install:/usr/local/bundle
+      - node_modules:/tailwind-rails-sample/node_modules
+      - postgres:/var/lib/postgresql/data
+  postgres:
+    image: postgres
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+    ports:
+      - "5432:5432"
+    volumes_from:
+      - datastore
+
+  rails:
+    build: .
+    tty: true
+    stdin_open: true
+    command: /bin/sh -c "rm -f /tailwind-rails-sample/tmp/pids/server.pid && bundle exec rails s -b 0.0.0.0"
+    environment:
+      - DATABASE_HOST=postgres
+      - DATABASE_PORT=5432
+      - DATABASE_USER=postgres
+      - DATABASE_PASSWORD=password
+      - WEBPACKER_DEV_SERVER_HOST=webpacker
+      - WEBPACKER_DEV_SERVER_PUBLIC=webpacker:3035
+      - WEBPACKER_DEV_SERVER_HOT=true
+    volumes_from:
+      - datastore
+    volumes:
+      - .:/tailwind-rails-sample
+    ports:
+      - "3000:3000"
+    depends_on:
+      - postgres
+      - webpacker
+  webpacker:
+    build: .
+    command: bin/webpack-dev-server
+    volumes:
+      - .:/tailwind-rails-sample
+    volumes_from:
+      - datastore
+    ports:
+      - "3035:3035"
+    environment:
+      - NODE_ENV=development
+      - RAILS_ENV=development
+      - WEBPACKER_DEV_SERVER_HOST=0.0.0.0
+      - WEBPACKER_DEV_SERVER_PUBLIC=0.0.0.0:3035
+      - WEBPACKER_DEV_SERVER_HOT=true
+volumes:
+  bundle_install:
+    driver: local
+  node_modules:
+    driver: local
+  postgres:
+    driver: local
+  redis:
+    driver: local
