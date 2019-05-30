@@ -3,12 +3,13 @@
 // a relevant structure within app/javascript and only use these pack files to reference
 // that code so it'll be compiled.
 
-import "./styles/application.scss"
+import "./styles/application.css"
 
 require("@rails/ujs").start()
 require("turbolinks").start()
 require("@rails/activestorage").start()
 require("channels")
+require("./hello_vue")
 
 
 // Uncomment to copy all static images under ../images to the output folder and reference
