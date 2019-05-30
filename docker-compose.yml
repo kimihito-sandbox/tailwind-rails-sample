@@ -40,7 +40,7 @@ services:
       - webpacker
   webpacker:
     build: .
-    command: bin/webpack-dev-server
+    command: bin/yarn start
     volumes:
       - .:/tailwind-rails-sample
     volumes_from:
